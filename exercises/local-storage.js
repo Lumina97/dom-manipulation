@@ -38,3 +38,65 @@
  */
 
 // Your code goes here...
+
+const favs = {
+  items: [],
+};
+const storageName = "favs";
+
+const getMemory = function (element) {
+  const children = Array.from(element.children);
+  const storage = JSON.parse(localStorage.getItem(storageName));
+  children.forEach((child) => {
+    if (storage.items.includes(child.id)) {
+      child.style.backgroundColor = "red";
+    }
+  });
+};
+
+const doesExistInLocalStorage = function (element) {
+  const storage = JSON.parse(localStorage.getItem(storageName));
+  if (storage) {
+    if (storage.items.includes(element.id)) return true;
+    return false;
+  }
+  //storage does not exist so create it.
+  localStorage.setItem(storageName, JSON.stringify(favs));
+  return false;
+};
+
+const addToLocalStorage = function (element) {
+  if (!doesExistInLocalStorage(element)) {
+    const storage = JSON.parse(localStorage.getItem(storageName));
+    storage.items.push(element.id);
+    localStorage.setItem(storageName, JSON.stringify(storage));
+  }
+};
+
+const removeFromLocalStorage = function (element) {
+  if (doesExistInLocalStorage(element)) {
+    const storage = JSON.parse(localStorage.getItem(storageName));
+    const idToRemove = storage.items.indexOf(element.id);
+    storage.items.splice(idToRemove, 1);
+    localStorage.setItem(storageName, JSON.stringify(storage));
+  }
+};
+
+const callbackFn = (e) => {
+  const item = e.target;
+  if (Array.from(item.classList).includes("card")) {
+    if (doesExistInLocalStorage(item)) {
+      removeFromLocalStorage(item);
+      item.style.backgroundColor = "White";
+    } else {
+      addToLocalStorage(item);
+      item.style.backgroundColor = "red";
+    }
+  }
+};
+
+const mainContainer = document.querySelector(".cardsContainer");
+
+mainContainer.addEventListener("click", callbackFn);
+
+getMemory(mainContainer);
